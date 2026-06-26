@@ -24,18 +24,32 @@ export const getListingById = async (req, res) => {
   try {
     const { id } = req.params; 
 
-    const { data, error } = await supabase
+    const { data:listingData, error:listingError } = await supabase
       .from('dorms')
       .select('*') 
       .eq('id', id)
       .single(); // tells supabase to return an object instead of an array 
     
-      if (error) {
-        return res.status(404).json({ error: 'Listing not found'});
-      }
-      return res.json(data);
+    if (listingError || !listingData) {
+      return res.status(404).json({ error: 'Listing not found'});
+    }
+
+    // fetch the images 
+    const { data:imagesData, error:imagesError } = await supabase 
+      .from('dorm_images') 
+      .select('image_url') 
+      .eq('dorm_id', id) 
+    
+    if (imagesError) throw imagesError;
+
+    const images = imagesData ? imagesData.map(item => item.image_url) : []; 
+
+    return res.json({
+      ...listingData,
+      images: images
+    }); 
   } catch (error) {
+    console.log('Backend Server Error: ', error.message);
     return res.status(500).json({ error: error.message });
   }
 }
-

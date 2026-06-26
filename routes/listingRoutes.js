@@ -4,6 +4,6 @@ const router = express.Router();
 
 
 router.get('/', getListings);
-router.get('/:id', getListingById)
+router.get('/:id', getListingById);
 
 export default router;
