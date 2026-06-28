@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabaseClient.js'; 
+import { getDistance } from '../utils/getDistance.js';
 
 // get all listings 
 export const getListings = async (req, res) => {
@@ -50,7 +51,7 @@ export const getListings = async (req, res) => {
 
       // amenities and features
       if (typeArray.includes('ref')){
-        query = query.eq('has_aircon', true);
+        query = query.eq('has_ref', true);
       }
       if (typeArray.includes('aircon')){
         query = query.eq('has_aircon', true);
@@ -137,11 +138,13 @@ export const createListing = async (req, res) => {
     // destructure the listing details from the form body 
     const { name, price, lat, lng, type, capacity, has_aircon, tenant_type, visitors_allowed, pets_allowed, cooking_allowed, laundry_allowed, has_parking, with_curfew, address, phone } = req.body;
 
+    const distance_from_up_main_gate = await getDistance(parseFloat(lat), parseFloat(lng));
+
     const { data, error } = await supabase 
       .from('dorms')
       .insert([
         {
-          name, price, lat, lng, type, capacity, has_aircon, tenant_type, visitors_allowed, pets_allowed, cooking_allowed, laundry_allowed, has_parking, with_curfew, address, phone, user_id: userId
+          name, price, lat, lng, type, capacity, has_aircon, tenant_type, visitors_allowed, pets_allowed, cooking_allowed, laundry_allowed, has_parking, with_curfew, address, phone, distance_from_up_main_gate, user_id: userId
         }
       ])
       .select();

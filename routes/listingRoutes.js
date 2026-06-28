@@ -1,5 +1,5 @@
 import express from 'express'; 
-import { getListings, getListingById } from '../controllers/listingController.js'
+import { createListing, getListings, getListingById } from '../controllers/listingController.js'
 import { requireAuth } from '../middleware/authMiddleware.js';
 const router = express.Router(); 
 

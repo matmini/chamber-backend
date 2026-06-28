@@ -11,8 +11,8 @@ export const requireAuth = async (req, res, next) => {
     }
 
     // isolate the actual token string 
-    const token = authHeader.split(' '[1]); 
-
+    const token = authHeader.split(' ')[1]; 
+    // console.log('token:', token);
     // ask supabase to validate the token 
     const { data: {user}, error } = await supabase.auth.getUser(token);
 
