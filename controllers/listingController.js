@@ -4,9 +4,20 @@ import { supabase } from '../config/supabaseClient.js';
 export const getListings = async (req, res) => {
   try {
     const searchTerm = req.query.search; 
+    const sortBy  = req.query.sort;
+    // console.log("Searh:",searchTerm);
+    // console.log("Sort:",sortBy);
     let query = supabase.from('dorms').select('*'); 
     if (searchTerm) {
       query = query.ilike('name', `%${searchTerm}%`);
+    }
+    
+    if (sortBy === 'price-asc') {
+      query = query.order('price', {ascending: true});
+    } else if (sortBy === 'price-desc') {
+      query = query.order('price', {ascending: false});
+    } else if (sortBy === 'distance-asc') {
+      query = query.order('distance_from_up_main_gate', {ascending:true})
     }
 
     const { data, error } = await query; 
