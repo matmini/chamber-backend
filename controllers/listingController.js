@@ -5,11 +5,75 @@ export const getListings = async (req, res) => {
   try {
     const searchTerm = req.query.search; 
     const sortBy  = req.query.sort;
+    const types = req.query.types;
+    // console.log(types);
     // console.log("Searh:",searchTerm);
     // console.log("Sort:",sortBy);
     let query = supabase.from('dorms').select('*'); 
     if (searchTerm) {
       query = query.ilike('name', `%${searchTerm}%`);
+    }
+
+    if (types) {
+    // 'studio'
+    // '1br'
+    // '2br'
+    // 'coed'
+    // 'female'
+    // 'male'
+    // 'ref'
+    // 'aircon'
+    // 'parking'
+    // 'curfew'
+    // 'cooking'
+    // 'pets'
+    // 'visitors'
+
+      // split the string to array 
+      const typeArray = types.split(','); 
+      
+      // room types
+      const roomTypes = typeArray.filter(item => 
+        ['studio', '1br', '2br','many_br'].includes(item)
+      );
+      if (roomTypes.length > 0) {
+        query = query.in('type', roomTypes);
+      }
+
+      // tenants
+      const tenants = typeArray.filter(item => 
+        ['coed', 'female', 'male'].includes(item)
+      );
+      if (tenants.length > 0) {
+        query = query.in('tenant_type', tenants);
+      }
+
+      // amenities and features
+      if (typeArray.includes('ref')){
+        query = query.eq('has_aircon', true);
+      }
+      if (typeArray.includes('aircon')){
+        query = query.eq('has_aircon', true);
+      }
+      if (typeArray.includes('visitors')){
+        query = query.eq('visitors_allowed', true);
+      }
+      if (typeArray.includes('cooking')){
+        query = query.eq('cooking_allowed', true);
+      }
+      if (typeArray.includes('pets')){
+        query = query.eq('pets_allowed', true);
+      }
+      if (typeArray.includes('laundry')){
+        query = query.eq('laundry_allowed', true);
+      }
+      if (typeArray.includes('parking')){
+        query = query.eq('has_parking', true);
+      }
+      if (typeArray.includes('curfew')){
+        query = query.eq('with_curfew', true);
+      }
+
     }
     
     if (sortBy === 'price-asc') {
