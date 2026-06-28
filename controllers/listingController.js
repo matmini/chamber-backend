@@ -128,3 +128,28 @@ export const getListingById = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 }
+
+export const createListing = async (req, res) => {
+  try {
+    // grab the authenticated user's id from the auth middleware
+    const userId = req.user.id;
+
+    // destructure the listing details from the form body 
+    const { name, price, lat, lng, type, capacity, has_aircon, tenant_type, visitors_allowed, pets_allowed, cooking_allowed, laundry_allowed, has_parking, with_curfew, address, phone } = req.body;
+
+    const { data, error } = await supabase 
+      .from('dorms')
+      .insert([
+        {
+          name, price, lat, lng, type, capacity, has_aircon, tenant_type, visitors_allowed, pets_allowed, cooking_allowed, laundry_allowed, has_parking, with_curfew, address, phone, user_id: userId
+        }
+      ])
+      .select();
+
+    if (error) throw error; 
+
+    return res.status(201).json({ message: "Listing created successfully!", data}); 
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
